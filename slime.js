@@ -153,7 +153,7 @@ function collisionDetection(){
 const utyu = new Image();
 utyu.src  = "imgs/utyuu640x437.jpg";
 const chizMap = new Image();
-utyu.src  = "imgs/chizman640x360.png";
+chizMap.src  = "imgs/chizman640x360.png";
 //マップデータをやり取りする関数
 let mapX=0;
 let mapY=0;
