@@ -1,0 +1,20 @@
+body {
+    background-color: #000000;
+    color:white;
+}
+
+#stage {
+    margin: 20px;
+    background-color: #1a1a15;
+}
+
+.text1{
+    
+    font-size: 40px;
+    
+}
+#txtField{
+    background-color: #140b33;
+    width:800px;
+    height:300px;
+}
