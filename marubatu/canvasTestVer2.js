@@ -60,6 +60,22 @@ function loadFunc() {
             //
         }
     }
+
+    //アイテムを定義
+    let itemWidth  = 18;
+    let itemHeight = 9;
+    let item = [];
+    for(let c=0; c<brickColumnCount; c++){
+        item[c] = [];
+        for(let r=0; r<brickRowCount; r++){ 
+            if(bricks[c][r].status>=1){
+                item[c][r] = {x:bricks[c][r].x, y:bricks[c][r].y, status:1, itemD:0};
+            }else{
+                item[c][r] = {x:bricks[c][r].x, y:bricks[c][r].y, status:0};
+            }
+        }
+    }
+
     
     //定義したブロックを描画
     function drawBricks(){
@@ -69,7 +85,7 @@ function loadFunc() {
                 if(bricks[c][r].status >= 1){                    
                     let brickX = (c*(brickWidth+brickPadding))+brickOffsetleft;
                     let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-                    //それを配列に代入
+                    //座標を配列に代入(別の関数で使う為)
                     bricks[c][r].x = brickX;
                     bricks[c][r].y = brickY;
                     ctx.beginPath();
@@ -88,11 +104,33 @@ function loadFunc() {
                     ctx.fill();
                     ctx.closePath();
                 }
+                //アイテムの描画
+                if(item[c][r].status>=2){
+                    itemX = (c*(brickWidth+brickPadding))+brickOffsetleft;
+                    itemY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+                    item[c][r].x = itemX + brickWidth/3;
+                    item[c][r].y = itemY;
+                    ctx.beginPath();
+                    ctx.rect(item[c][r].x, itemY+item[c][r].itemD, itemWidth, itemHeight);
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fill();
+                    ctx.closePath();
+                    item[c][r].itemD+=1;
+                    if(itemY+item[c][r].itemD >= canvas.height){
+                        item[c][r].status = 0;
+                    }else if(itemY+item[c][r].itemD >= canvas.height-paddleHeight ){
+                        if(paddleX < item[c][r].x && item[c][r].x < paddleX + paddleWidth + itemWidth) {
+                            score += 200;
+                            item[c][r].status = 0;
+                        }
+                    }
+                }
             }
         }
     }
 
 
+    //ボールの描画
     function drowBall(){
         ctx.beginPath();                        //描画宣言
         ctx.arc(x, y, ballRadius, 0, Math.PI*2);//玉のサイズや形を描画
@@ -214,7 +252,7 @@ function loadFunc() {
     });
 
     
-    //ブロックとの衝突を検出する関数
+    //ブロックとボールの衝突を検出する関数
     function cllisionDetecrion(){
         
         for(let c=0; c<brickColumnCount; c++){
@@ -246,6 +284,7 @@ function loadFunc() {
                             dy = -dy;
                             b.status -= 1;
                             score+=30;
+                            item[c][r].status = b.status==0 ? 2 : 1;
                         }
                     }
                     
@@ -253,6 +292,8 @@ function loadFunc() {
             }
         }
     }
+
+    
 
     
     let interval = setInterval(drow, 7);
