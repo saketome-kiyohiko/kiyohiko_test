@@ -1,0 +1,31 @@
+・sagatMapXでサガットが右に歩いた累計を示せる。
+・sagatMapXが増加する分だけ、fieldXが増加する。
+・fieldXの座標によって、その座標の高さう示すfieldYが設定される。
+・sagatの着地位置はsagatMapXの中のfieldXの中のfieldYによって決まる。
+・sagatMapXはfieldXとsagatXの合計で決まる
+よって、
+sagatMapX = fieldX + sagatX;
+
+//サガットの目の前が壁だったらぶつかって進めない判定
+
+
+//ジャンプして障害物を越える判定
+着地点をfieldYに合わせたい
+・サガットが着地状態にいるときは、sagatY = sagatFieldY;
+・サガットがジャンプ状態のときは、sagatY = sagatY;
+この判定を極力フレームの最後辺りに行う。
+・サガットの落下状態が始まったら、着地できる体制にする
+if(sagatY+90 < sagatfieldY){isSagatJump = 0;}
+
+
+//サガットをカメラが追いかけてマップを移動できるようにしたい
+
+sagarX + fieldX
+
+
+・敵を大量に作る
+forを使って関数を回す
+monster関数に引数を渡して、モンスターの数や挙動をある程度のテンプレの中で動かす
+
+・無敵時間の実装
+ダメージを受けたら、無敵時間のアクションに入る
