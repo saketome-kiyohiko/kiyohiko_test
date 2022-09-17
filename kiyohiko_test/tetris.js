@@ -22,6 +22,7 @@ let btnDown =document.querySelector('#down');
 let inputWidth = document.querySelector('#inputWidth');
 let inputHeight = document.querySelector('#inputHeight');
 
+// 初期値
 let field;
 let fieldWidth  = 10;
 let fieldHeight = 20;
@@ -42,25 +43,30 @@ const countUp = () => {
         gameStop();
     }
     p4.innerText =`TIME ${time}秒`;
-    }
-    
+}
 
 p3.innerText = `SCORE ${score}点`;
 //field[横軸x][縦軸y]
-field = new Array(fieldHeight+2);
-for(let y=0; y<field.length; y++){
-    field[y] = new Array(fieldWidth+2);
-}
-//フィールドを作成。壁は99、それ以外は0
-for(let y=0; y<fieldHeight+2; y++){
-    for(let x=0; x<fieldWidth+2; x++){
-        if(x==0||y==0||x==fieldWidth+1||y==fieldHeight+1){
-            field[y][x] = 99;
-        }else{
-            field[y][x] = 0;
+
+//フィールド（壁）を新しく作成し直す処理
+const makeField = function() {
+    field = new Array(fieldHeight+2);
+    for(let y=0; y<field.length; y++){
+        field[y] = new Array(fieldWidth+2);
+    }
+    //フィールドを作成。壁は99、それ以外は0
+    for(let y=0; y<fieldHeight+2; y++){
+        for(let x=0; x<fieldWidth+2; x++){
+            if(x==0||y==0||x==fieldWidth+1||y==fieldHeight+1){
+                field[y][x] = 99;
+            }else{
+                field[y][x] = 0;
+            }
         }
     }
 }
+
+
 
 // フィールドを表示させる関数
 /**
@@ -69,8 +75,6 @@ for(let y=0; y<fieldHeight+2; y++){
  *  1 = 振っているミノ
  *  2 = 落ちたミノ 
  */
-
-
 let gameWindow = ()=>{
     let fieldText = "";
     let newText ="";
@@ -94,7 +98,7 @@ let gameWindow = ()=>{
     fieldTag.innerHTML = fieldText;
 }
 
-let play;
+let play;   //ゲーム進行の関数
 widpoint = Math.floor(fieldWidth/2);
 heipoint = 1;
 let boxNum = Math.floor(Math.random()*43)%7;
@@ -110,7 +114,9 @@ randomNum =()=>{
 }
 //ゲームを進行するための関数
 play = ()=>{
-    
+    if(!gameON){
+        return
+    }
     for(let y=1; y<=fieldHeight; y++){
         for(let x=1; x<=fieldWidth; x++){
             if((field[y][x]==1&&(field[y+1][x]==2||y==fieldHeight))){
@@ -156,6 +162,9 @@ let leftMoveNG  = false;
 let rightMoveNG = false;
 //ミノを作成、制御する関数
 let mino =(boxNum,boxStyle)=>{
+    if(!gameON){
+        return
+    }
     /*n = 0;
     if(field[heipoint+1][widpoint]==99||field[heipoint+1][widpoint]==2){
         n = 1;
@@ -537,15 +546,19 @@ let minoRoll = ()=>{
 }
 
 let gameON = false;
+//ミノが落ちる挙動（playごとに呼び出される）
 //ブロックを置いたときに一列が揃ってるかどうかの判定
 let minoLine = ()=>{
+    if(!gameON){
+        return
+    }
     combo = 1;
     for(let y=1; y<=fieldHeight; y++){
         for(let x=1; 1<=fieldWidth; x++){
             if(field[y][x]!=2){
                 break;
             }else if(field[y][x]==2){
-                if(x==fieldWidth){
+                if(x==fieldWidth) {
                     //揃ってると下記処理を行う
                     //for(let i=1; i<=fieldWidth; i++){
                         //field[y][i] = 0;
@@ -659,36 +672,38 @@ btnMino.addEventListener('click',()=>{
 
 
 //開始終了行程の関数
-let gamePlay;
-let gamewind;
+let intervalGamePlay;
+let intervalGameWindow;
 let startCount;
 //ゲームスタートするためのボタン
 push.addEventListener('click',()=>{
     gameON = gameON == false ? true : false ;
     fieldWidth  = Math.floor(inputWidth.value);
     fieldHeight = Math.floor(inputHeight.value);
-    if(gameON){
-        gamePlay = setInterval(play,speed);
-        gamewind = setInterval(gameWindow,speed);
+    makeField();
+    if(gameON) {
+        intervalGamePlay = setInterval(play,speed);
+        intervalGameWindow = setInterval(gameWindow,speed);
         startCount = setInterval(countUp, 1000);
     }
 });
-//ゲーム速度を制御するための関数
+//ゲーム速度を制御するための関数(速度を変動させるために、いちどタイマーをストップして、再度始動する)
 let gameStop =()=>{
-    clearInterval(gamePlay);
-    clearInterval(gamewind);
-    gamePlay = setInterval(play,speed);
-    gamewind = setInterval(gameWindow,speed);
+    clearInterval(intervalGamePlay);
+    clearInterval(intervalGameWindow);
+    intervalGamePlay = setInterval(play,speed);
+    intervalGameWindow = setInterval(gameWindow,speed);
 }
 //スコア更新やゲームオーバーを制御する関数
 let GAMEOVER =()=>{
-    clearInterval(gamePlay);
-    clearInterval(gamewind);
-    clearInterval(startCount);
     p2.innerText = "GAME_OVER"
-    if(socore>hightScore){
-        p1.innerText = `ハイスコア${hightScore}点`;
-    }
+    console.log("score!",score)
+    hightScore = score > hightScore ? score : hightScore;
+    p1.innerText = `現在のハイスコア${hightScore}点`;
+    clearInterval(intervalGamePlay);
+    clearInterval(intervalGameWindow);
+    clearInterval(startCount);
+    gameON = false;
 };
 
 
